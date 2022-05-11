@@ -1,0 +1,13 @@
+bcp "SELECT TOP 3
+    StockItemName AS [@Name],
+    SupplierID AS [SupplierID],
+    UnitPackageID AS [Package/UnitPackageID],
+    OuterPackageID AS [Package/OuterPackageID],
+    QuantityPerOuter AS [Package/QuantityPerOuter],
+    TypicalWeightPerUnit AS [Package/TypicalWeightPerUnit],
+    LeadTimeDays AS [LeadTimeDays],
+	IsChillerStock AS [IsChillerStock],
+	TaxRate AS [TaxRate],
+	UnitPrice AS [UnitPrice]
+FROM [WideWorldImporters].[Warehouse].[StockItems]
+FOR XML PATH('Item'), ROOT('StockItems')" queryout "C:\OTUS_MSSQL_Repo\StockItems1.xml" -w -S DESKTOP-E3SGLPM -T
