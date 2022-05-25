@@ -1,32 +1,27 @@
 ﻿USE IntegrationDB
 
 CREATE TABLE dbo.Tasks
-(Id bigint identity primary key clustered,
-SourceSystemId uniqueidentifier,
+(SourceSystemId uniqueidentifier primary key clustered,
 TargetSystemId bigint null, 
-IntagrationDate datetime2,
-CONSTRAINT UNQ_Tasks_SourceSystemId UNIQUE (SourceSystemId))
+IntegrationDate datetime2)
 
 CREATE TABLE dbo.Files
-(Id bigint identity primary key clustered,
-SourceSystemId uniqueidentifier,
+(SourceSystemId uniqueidentifier primary key clustered,
 TargetSystemId bigint null, 
-TaskId bigint REFERENCES dbo.Tasks(Id),
-FileString varchar(max),
+TaskId uniqueidentifier REFERENCES dbo.Tasks(SourceSystemId),
+FileBase64String varchar(max),
 FileName varchar(250),
-IntagrationDate datetime2,
-CONSTRAINT UNQ_Files_SourceSystemId UNIQUE (SourceSystemId))
+IntegrationDate datetime2)
 
-CREATE TABLE dbo.Errors
+CREATE TABLE dbo.IntegrationLog
 (Id bigint identity primary key clustered,
-TaskId bigint REFERENCES dbo.Tasks(Id),
+TaskId uniqueidentifier REFERENCES dbo.Tasks(SourceSystemId),
 ErrorMessage varchar(500),
-ErrorDate datetime2)
+IntegrationDate datetime2,
+IsSuccess bit)
 
-CREATE TABLE dbo.Quenue
-(Id bigint identity primary key clustered,
-SourceSystemId uniqueidentifier,
-CONSTRAINT UNQ_Quenue_SourceSystemId UNIQUE (SourceSystemId))
+CREATE TABLE dbo.[Queue]
+(SourceSystemId uniqueidentifier primary key clustered)
 
 CREATE INDEX IX_SourceSystemId ON dbo.Tasks
 (SourceSystemId)
@@ -36,11 +31,8 @@ CREATE INDEX IX_SourceSystemId ON dbo.Files
 (SourceSystemId)
 INCLUDE (TargetSystemId)
 
-CREATE INDEX IX_ErrorDate ON dbo.Errors
-(ErrorDate)
-
-CREATE INDEX IX_SourceSystemId ON dbo.Quenue
-(SourceSystemId)
+CREATE INDEX IX_ErrorDate ON dbo.IntegrationLog
+(IntegrationDate)
 
 --добавила для ДЗ, но в проект я добавлять такое не стану, так как критична производительность, а эта проверка будет на стороне API
 ALTER TABLE dbo.Files
